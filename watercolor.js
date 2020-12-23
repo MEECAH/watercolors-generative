@@ -10,14 +10,14 @@ seed = 3693199348549950; //use this line for a specific seed
 
 //edit this to increase the number of recursions
 //on the deformation function
-var numDeformationLayers = 1;
+var numDeformationLayers = 8;
 
 //choose a basic drawing mode, 0 for lines 1 for color fill
-let drawingMode = 0;
+let drawingMode = 1;
 
 function setup() {
   //frameRate(1)
-  let myCanvas = createCanvas(imageScale * 1920, imageScale * 1080);
+  let myCanvas = createCanvas(imageScale * 1100, imageScale * 950);
   background(35);
   angleMode(DEGREES);
   myCanvas.parent("container");
@@ -25,7 +25,7 @@ function setup() {
   randomSeed(seed);
 
   sides = 360 / 10;
-  r = imageScale * 280;
+  r = imageScale * 200;
 
   // this generates a set of (x,y)
   // coordinates that define a 10 sided ellipse like polygon
@@ -103,7 +103,7 @@ function deform(vertices) {
       vertices[i + 1][0] - vertices[i][0],
       vertices[i + 1][1] - vertices[i][1]
     );
-    vect.mult(randomGaussian(0, 100)); // / (numDeformationLayers - 1));
+    vect.mult(Math.random()); // / (numDeformationLayers - 1));
     //vect.setMag( vect.mag()*magVariance / (1 * numDeformationLayers)); //add imperfection to the mag of jut
     vect.rotate(90 + angleVariance); //add imperfection to the rotation of the jut
     vect.add(midpoint);
