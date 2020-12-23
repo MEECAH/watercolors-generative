@@ -10,17 +10,10 @@ seed = 3693199348549950; //use this line for a specific seed
 
 //edit this to increase the number of recursions
 //on the deformation function
-var numDeformationLayers = 6;
+var numDeformationLayers = 1;
 
-let seedtext = document.getElementById("seed");
-seedtext.innerHTML =
-  `
-<p>
-  seed value: ` +
-  seed +
-  ` 
-</p>
-`;
+//choose a basic drawing mode, 0 for lines 1 for color fill
+let drawingMode = 0;
 
 function setup() {
   //frameRate(1)
@@ -53,13 +46,16 @@ function setup() {
 }
 
 function draw() {
-  fill(237, 34, 93);
-  noStroke();
 
-  //draw white stuff
-  //stroke(255);
-  //noFill();
+  if(drawingMode == 0){
+    stroke(255);
+    noFill();
+  }else{
+    fill(237, 34, 93);
+    noStroke();
+  }
 
+  //base polygon before any deformations
   beginShape();
   //vertices.forEach((vert) => vertex(vert[0], vert[1]));
   endShape();
@@ -70,6 +66,7 @@ function draw() {
   recurrences = 0;
   let deformed = deform(vertices);
 
+  //recursively deformed polygon
   beginShape();
   deformed.forEach((vert) => vertex(vert[0], vert[1]));
   endShape();
@@ -163,3 +160,13 @@ function drawArrow(base, vec, myColor) {
   triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
   pop();
 }
+
+let seedtext = document.getElementById("seed");
+seedtext.innerHTML =
+  `
+<p>
+  seed value: ` +
+  seed +
+  ` 
+</p>
+`;

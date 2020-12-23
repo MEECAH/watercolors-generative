@@ -105,4 +105,4 @@ dist
 app.js
 
 #folder for art renders
-.renders/
+renders/
