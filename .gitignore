@@ -103,3 +103,6 @@ dist
 # TernJS port file
 .tern-port
 app.js
+
+#folder for art renders
+.renders/

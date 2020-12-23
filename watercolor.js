@@ -1,30 +1,35 @@
 //some global variables
-var sides, r, recurrences;
+var seed, sides, r, recurrences, mpVariance, angleVariance, magVariance;
 var vertices = [];
 var m = 1;
 var sd = 1;
 var imageScale = 1;
-var seed = Math.round(Math.random()*Number.MAX_SAFE_INTEGER)
 
-let seedtext = document.getElementById("seed")
-seedtext.innerHTML = `
-<p>
-seed value: `+seed+` 
-</p>
-`
+//seed = Math.round(Math.random() * Number.MAX_SAFE_INTEGER); //random seed
+seed = 3693199348549950; //use this line for a specific seed
 
 //edit this to increase the number of recursions
 //on the deformation function
-var numDeformationLayers = 1;
+var numDeformationLayers = 6;
+
+let seedtext = document.getElementById("seed");
+seedtext.innerHTML =
+  `
+<p>
+  seed value: ` +
+  seed +
+  ` 
+</p>
+`;
 
 function setup() {
   //frameRate(1)
-  let myCanvas = createCanvas(imageScale * 1100, imageScale * 990);
+  let myCanvas = createCanvas(imageScale * 1920, imageScale * 1080);
   background(35);
   angleMode(DEGREES);
   myCanvas.parent("container");
 
-  randomSeed(seed)
+  randomSeed(seed);
 
   sides = 360 / 10;
   r = imageScale * 280;
@@ -48,15 +53,15 @@ function setup() {
 }
 
 function draw() {
-  //fill(237, 34, 93);
-  //noStroke();
+  fill(237, 34, 93);
+  noStroke();
 
   //draw white stuff
-  stroke(255);
-  noFill();
+  //stroke(255);
+  //noFill();
 
   beginShape();
-  vertices.forEach((vert) => vertex(vert[0], vert[1]));
+  //vertices.forEach((vert) => vertex(vert[0], vert[1]));
   endShape();
   //console.log(vertices);
 
@@ -83,11 +88,16 @@ function deform(vertices) {
   strokeWeight(3);
 
   for (let i = 0; i < vertices.length - 1; i += 2) {
-    midpoint = calcMidpoint(vertices[i], vertices[i + 1]);
-    midpoint.add(randomGaussian(1, 40)); //this adds imperfection to the midpoint location
-    point(midpoint);
+    //for fine tuning the randomness on polygon deformation
+    mpVariance = 0; //randomGaussian(1, 10)
+    angleVariance = 0; //randomGaussian(1, 10);
+    magVariance = 1; //posRandomGaussian(20, 50);
 
-    angleMode(RADIANS);
+    midpoint = calcMidpoint(vertices[i], vertices[i + 1]);
+    midpoint.add(mpVariance); //this adds imperfection to the midpoint location
+    //point(midpoint);
+
+    //angleMode(RADIANS);
 
     base = createVector(0, 0);
     //drawArrow(base,midpoint,'red')
@@ -96,9 +106,9 @@ function deform(vertices) {
       vertices[i + 1][0] - vertices[i][0],
       vertices[i + 1][1] - vertices[i][1]
     );
-    //vect.mult(Math.random()); // / (numDeformationLayers - 1));
-    vect.setMag(vect.mag() / (1 * numDeformationLayers));
-    vect.rotate(PI / 2);
+    vect.mult(randomGaussian(0, 100)); // / (numDeformationLayers - 1));
+    //vect.setMag( vect.mag()*magVariance / (1 * numDeformationLayers)); //add imperfection to the mag of jut
+    vect.rotate(90 + angleVariance); //add imperfection to the rotation of the jut
     vect.add(midpoint);
 
     //console.log(vect);
@@ -128,6 +138,15 @@ function calcMidpoint(v1, v2) {
   midpoint.add(v1);
   midpoint.add(v2);
   return midpoint.div(vert.length);
+}
+
+//truncate random gaussian, making mean value more likely(?)
+function posRandomGaussian(m, sd) {
+  let s = randomGaussian(m, sd);
+  if (s < 0) {
+    s = 0;
+  }
+  return s;
 }
 
 // draw an arrow for a vector at a given base position
