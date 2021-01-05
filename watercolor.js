@@ -2,25 +2,28 @@
 var seed,
   sides,
   r,
-  recurrences,
+  recurrences = 0,
   mpVariance,
   angleVariance,
   magVariance,
   numDesiredPaintLayers,
-  numPaintLayersDrawn;
-var vertices = [];
-var ogPolygon = [];
-var m = 1;
-var sd = 1;
-var imageScale = 1;
-var frameCount = 1; //set to 0 for gif creation, else set to 1
+  numPaintLayersDrawn,
+  vertices = [],
+  ogPolygon = [],
+  baseDeformedPolygon = [],
+  tmp = [],
+  m = 1,
+  sd = 1,
+  imageScale = 1,
+  frameCount = 1, //set to 0 for gif creation, else set to 1
+  img;
 
-seed = Math.round(Math.random() * Number.MAX_SAFE_INTEGER); //random seed
-//seed = 3693199348549950; //use this line for a specific seed
+//seed = Math.round(Math.random() * Number.MAX_SAFE_INTEGER); //random seed
+seed = 3693199348549950; //use this line for a specific seed
 
 //edit this to increase the number of recursions
 //on the deformation function
-var numDeformationLayers = 5;
+var numDeformationLayers = 3;
 
 //choose a basic drawing mode, 0 for lines 1 for color fill
 let drawingMode = 1;
@@ -58,21 +61,21 @@ function setup() {
 }
 
 function draw() {
-
-  
-
   if (drawingMode == 0) {
     stroke(255);
     noFill();
   } else {
-    fill(237, 34, 93,6);
+    fill(237, 34, 93, 6);
     noStroke();
   }
 
-  for(let i = 0; i<50; i++){
-    splotch();
-    vertices = [];
-    vertices = [...ogPolygon]
+  baseDeformedPolygon = deform(vertices);
+  tmp = [...baseDeformedPolygon];
+
+  for (let i = 0; i < 50; i++) {
+    let details = deform(baseDeformedPolygon);
+    splotch(details);
+    vertices = [...tmp];
   }
 
   // if (frameCount == 5) {
@@ -88,12 +91,12 @@ function draw() {
   //loop();
 }
 
-function splotch() {
+function splotch(arg) {
   //this if/else is for making gifs of the deformation process
   if (frameCount == 0) {
     //base polygon before any deformations
     beginShape();
-    vertices.forEach((vert) => vertex(vert[0], vert[1]));
+    arg.forEach((vert) => vertex(vert[0], vert[1]));
     endShape();
     //console.log(vertices);
 
@@ -101,8 +104,7 @@ function splotch() {
   } else {
     center = createVector(width / 2, height / 2);
 
-    recurrences = 0;
-    let deformed = deform(vertices);
+    let deformed = deform(arg);
 
     //recursively deformed polygon
     beginShape();
@@ -120,18 +122,24 @@ function splotch() {
 }
 
 //custom function to deform by add 'jutting' between polygon edges
-function deform(vertices) {
+function deform(arg) {
   push();
   //stroke(255, 0, 0);
   //strokeWeight(3);
 
-  for (let i = 0; i < vertices.length - 1; i += 2) {
+  //deep copy arg array
+  arr = [];
+  for (let i = 0; i < arg.length; i++) {
+    arr.push(arg[i]);
+  }
+
+  for (let i = 0; i < arr.length - 1; i += 2) {
     //for fine tuning the randomness on polygon deformation
     mpVariance = 0; //randomGaussian(1, 10)
     angleVariance = 0; //randomGaussian(1, 10);
     magVariance = 1; //posRandomGaussian(20, 50);
 
-    midpoint = calcMidpoint(vertices[i], vertices[i + 1]);
+    midpoint = calcMidpoint(arr[i], arr[i + 1]);
     midpoint.add(mpVariance); //this adds imperfection to the midpoint location
     //point(midpoint);
 
@@ -140,10 +148,7 @@ function deform(vertices) {
     base = createVector(0, 0);
     //drawArrow(base,midpoint,'red')
 
-    vect = createVector(
-      vertices[i + 1][0] - vertices[i][0],
-      vertices[i + 1][1] - vertices[i][1]
-    );
+    vect = createVector(arr[i + 1][0] - arr[i][0], arr[i + 1][1] - arr[i][1]);
     vect.mult(random()); // / (numDeformationLayers - 1));
     //vect.setMag( vect.mag()*magVariance / (1 * numDeformationLayers)); //add imperfection to the mag of jut
     vect.rotate(90 + angleVariance); //add imperfection to the rotation of the jut
@@ -154,7 +159,7 @@ function deform(vertices) {
 
     jut = [vect.x, vect.y];
     //console.log(jut);
-    vertices.splice(i + 1, 0, jut);
+    arr.splice(i + 1, 0, jut);
     //i++;
 
     //drawArrow(base,vect,'blue')
@@ -164,9 +169,10 @@ function deform(vertices) {
 
   recurrences++;
   if (recurrences == numDeformationLayers) {
-    return vertices;
+    recurrences = 0;
+    return arr;
   } else {
-    return deform(vertices);
+    return deform(arr);
   }
 }
 
