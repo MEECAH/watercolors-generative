@@ -8,6 +8,7 @@ var seed,
   magVariance,
   numDesiredPaintLayers,
   numPaintLayersDrawn,
+  numDeformationLayers,
   vertices = [],
   ogPolygon = [],
   baseDeformedPolygon = [],
@@ -23,7 +24,7 @@ seed = 3693199348549950; //use this line for a specific seed
 
 //edit this to increase the number of recursions
 //on the deformation function
-var numDeformationLayers = 3;
+//numDeformationLayers = 3;
 
 //choose a basic drawing mode, 0 for lines 1 for color fill
 let drawingMode = 1;
@@ -32,7 +33,7 @@ function setup() {
   //frameRate(1)
   //createLoop({duration:10, gif:true})
   let myCanvas = createCanvas(imageScale * 1100, imageScale * 930);
-  background(215);
+  background(230,230,230);
   angleMode(DEGREES);
   myCanvas.parent("container");
 
@@ -65,17 +66,21 @@ function draw() {
     stroke(255);
     noFill();
   } else {
-    fill(237, 34, 93, 6);
+    fill(255, 40, 45, 2);
     noStroke();
   }
 
-  baseDeformedPolygon = deform(vertices);
-  tmp = [...baseDeformedPolygon];
+  for (let i = 1; i <= 3; i++) {
+    numDeformationLayers = i;
+    baseDeformedPolygon = deform(vertices);
+    tmp = [...baseDeformedPolygon];
 
-  for (let i = 0; i < 50; i++) {
-    let details = deform(baseDeformedPolygon);
-    splotch(details);
-    vertices = [...tmp];
+    for (let i = 0; i < 17; i++) {
+      numDeformationLayers = 3;
+      //let details = deform(baseDeformedPolygon);
+      splotch(baseDeformedPolygon);
+      vertices = [...tmp];
+    }
   }
 
   // if (frameCount == 5) {
@@ -122,7 +127,7 @@ function splotch(arg) {
 }
 
 //custom function to deform by add 'jutting' between polygon edges
-function deform(arg) {
+function deform(arg, layers) {
   push();
   //stroke(255, 0, 0);
   //strokeWeight(3);
