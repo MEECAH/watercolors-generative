@@ -4,6 +4,6 @@ Started out attempting to implement the rough method of imitating real life wate
 Current state of algorithm implementation as of February 1st 2020:
 ![generative watercolor painting](https://i.imgur.com/2AW5AbC.png)
 
-gifs showing some underlying geometric deformations at work:
+gifs showing some underlying geometric deformations of a single layer at work:
 ![no fill deformations](https://i.imgur.com/fjfEvdG.gif)
 ![deformations with fill](https://i.imgur.com/xpsREtI.gif)
